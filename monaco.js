@@ -35,25 +35,13 @@
                 ['(', ')'],
             ],
             surroundingPairs: [
-                ['{', '}'],
-                ['[', ']'],
-                ['(', ')'],
-                ['\'', '\''],
-                ['~', '~'],
-                ['-', '-'],
-                ['_', '_'],
-                ['^', '^'],
-                [',', ','],
+                ['{', '}'], ['[', ']'], ['(', ')'],
+                ['\'', '\''], ['~', '~'], ['-', '-'],
+                ['_', '_'], ['^', '^'], [',', ','],
             ],
             autoClosingPairs: [
-                {open: '{', close: '}'},
-                {open: '[', close: ']'},
-                {open: '(', close: ')'},
-                {open: '~~', close: '~~'},
-                {open: '--', close: '--'},
-                {open: '__', close: '__'},
-                {open: '^^', close: '^^'},
-                {open: ',,', close: ',,'},
+                {open: '{', close: '}'},{open: '[', close: ']'},{open: '(', close: ')'},
+                {open: '~~', close: '~~'}, {open: '--', close: '--'}, {open: '__', close: '__'}, {open: '^^', close: '^^'},{open: ',,', close: ',,'},
             ],
             wordPattern: /(-?\d.\d\w)|([^`~!@#%^&*()-=+\[{\]}\|;:'",.<>/?\s]+)/g,
         });
@@ -84,6 +72,9 @@
                                     break;
                                 case 'navertv':
                                     return `https://tv.naver.com/v/${VideoId}`;
+                                    break;
+                                case 'vimeo':
+                                    return `https://vimeo.com/${VideoId}`;
                                     break;
                                 default:
                                     console.warn(`VideoURIFormatter: Undefined ServiceId "${ServiceId}"`);
@@ -134,7 +125,7 @@
                                             LineWiki.index+1+LineWiki[0].length
                                         );
                                         tooltip = WikiName;
-                                        url = window.location.protocol + '//' + window.location.host + viewerURI + encodeURIComponent(WikiName);
+                                        url = window.location.protocol + '//' + window.location.host + "/w/" + encodeURIComponent(WikiName);
                                     }
                                     else {
                                         let WikiName = LineWiki[2].replace(/\\(.)/, '$1');
@@ -145,7 +136,7 @@
                                             LineWiki.index+1+LineWiki[0].length
                                         );
                                         tooltip = WikiName;
-                                        url = window.location.protocol + '//' + window.location.host + viewerURI + encodeURIComponent(WikiName);
+                                        url = window.location.protocol + '//' + window.location.host + "/w/" + encodeURIComponent(WikiName);
                                     }
                                 }
                         }
@@ -331,7 +322,7 @@
         let target = document.getElementById('monaco');
         require.config({
             paths: {
-                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/'+monacoVersion+'/min/vs',
+                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/'+a.g(q('meta[name="monaco-version"]'), 'content')+'/min/vs',
                 'namu': '../src/script',
             },
         });
@@ -410,19 +401,25 @@
                     if(!TargetEditor) throw new Error('Invalid target element');
                 }
             namumark_register(monaco);
+            if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+                ThisTheme = 'vs-dark'
+            else
+                ThisTheme = 'vs'
+                
             window.monaco_namu = monaco.editor.create(target, {
                 language: 'namumark',
                 automaticLayout: true,
                 wordWrap: true,
+                theme: ThisTheme,
                 renderWhitespace: 'all',
-                // minimap: { enabled: false },
+                minimap: { enabled: false },
                 fontFamily: 'D2Coding, Consolas, "나눔고딕코딩", "Courier New", monospace',
-                value: DocContent.c
+                value: q('textarea.editor#pressdo-anchor[name="content"]').innerHTML
             });
             //target.querySelector('textarea').style.display = 'none';
             
             let quickaccess = new namu.toolbar.QuickAccess(window.monaco_namu);
-            document.querySelectorAll('li.t[data-pressdo-editor-top] button').forEach((elem) => { 
+            document.querySelectorAll('li.t.editor.top button').forEach((elem) => { 
                 elem.addEventListener('click', quickaccess.apply); 
             });
         });
